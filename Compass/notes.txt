@@ -1,0 +1,4 @@
+The tilt compensation appears to be working well, need to make sure that the HardIron calibraiton is good
+
+
+The HUD display needs work -- ask Sean to help finish that section so I can test
