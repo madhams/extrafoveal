@@ -30,9 +30,65 @@ guidance = []
 dist = []
 
 def click(event):
-    global canvas, num, guidance, words
+    global canvas, num, guidance, dist
     x,y = (event.x), (event.y)
     canvas.tab[num]['image'] = ImageTk.PhotoImage(marker_img)
+    guidance.append(canvas.create_image(x,y, image=canvas.tab[num]['image'], anchor='center'))
+    dist.append(canvas.create_text(x+20, y+5, text=f'{distance} m', font='SegoeUI 13',fill='black', anchor='nw'))
+    x_values.append(x)
+    y_values.append(y)
+    look_x.append(x)
+    look_y.append(y)
+    xspeeds.append(0)
+    yspeeds.append(0)
+    num += 1
+
+def blue(event):
+    global canvas, num, guidance, dist
+    x,y = (event.x), (event.y)
+    canvas.tab[num]['image'] = ImageTk.PhotoImage(marker_blue)
+    guidance.append(canvas.create_image(x,y, image=canvas.tab[num]['image'], anchor='center'))
+    dist.append(canvas.create_text(x+20, y+5, text=f'{distance} m', font='SegoeUI 13',fill='black', anchor='nw'))
+    x_values.append(x)
+    y_values.append(y)
+    look_x.append(x)
+    look_y.append(y)
+    xspeeds.append(0)
+    yspeeds.append(0)
+    num += 1
+
+def green(event):
+    global canvas, num, guidance, dist
+    x,y = (event.x), (event.y)
+    canvas.tab[num]['image'] = ImageTk.PhotoImage(marker_green)
+    guidance.append(canvas.create_image(x,y, image=canvas.tab[num]['image'], anchor='center'))
+    dist.append(canvas.create_text(x+20, y+5, text=f'{distance} m', font='SegoeUI 13',fill='black', anchor='nw'))
+    x_values.append(x)
+    y_values.append(y)
+    look_x.append(x)
+    look_y.append(y)
+    xspeeds.append(0)
+    yspeeds.append(0)
+    num += 1
+
+def red(event):
+    global canvas, num, guidance, dist
+    x,y = (event.x), (event.y)
+    canvas.tab[num]['image'] = ImageTk.PhotoImage(marker_red)
+    guidance.append(canvas.create_image(x,y, image=canvas.tab[num]['image'], anchor='center'))
+    dist.append(canvas.create_text(x+20, y+5, text=f'{distance} m', font='SegoeUI 13',fill='black', anchor='nw'))
+    x_values.append(x)
+    y_values.append(y)
+    look_x.append(x)
+    look_y.append(y)
+    xspeeds.append(0)
+    yspeeds.append(0)
+    num += 1
+
+def yellow(event):
+    global canvas, num, guidance, dist
+    x,y = (event.x), (event.y)
+    canvas.tab[num]['image'] = ImageTk.PhotoImage(marker_yellow)
     guidance.append(canvas.create_image(x,y, image=canvas.tab[num]['image'], anchor='center'))
     dist.append(canvas.create_text(x+20, y+5, text=f'{distance} m', font='SegoeUI 13',fill='black', anchor='nw'))
     x_values.append(x)
@@ -342,6 +398,10 @@ window.bind("<d>",look_right)
 # window.bind("<Right>",move_right)
 window.bind("<space>",deleteImage)
 window.bind("<Button-1>", click)
+window.bind("<b>", blue)
+window.bind("<g>", green)
+window.bind("<r>", red)
+window.bind("<y>", yellow)
 
 #Counting
 window.bind("<Up>",count_up)
@@ -353,9 +413,6 @@ canvas = tk.Canvas(window,width=x_boundary,height=y_boundary)
 canvas.pack()
 canvas.tab = [{} for q in range(50)]
 canvas.focus_set()
-
-#Load an image in the script
-img= (Image.open("marker.png"))
 
 ##No longer using had a visual background that interfered with marker image
 # dist_lab = tk.Label(window, fg='black')
@@ -397,9 +454,18 @@ move_y.pack()
 canvas.create_window(0, 100, window=move_y, anchor='nw')
 """
 
-
+#Load an image in the script
+img= (Image.open("marker.png"))
+blue = (Image.open("marker_blue.png"))
+green = (Image.open("marker_green.png"))
+red = (Image.open("marker_red.png"))
+yellow = (Image.open("marker_yellow.png"))
 #Resize the Image using resize method
 marker_img= img.resize((mark_bound,mark_bound), Image.Resampling.LANCZOS)
+marker_blue = blue.resize((mark_bound,mark_bound), Image.Resampling.LANCZOS)
+marker_green = green.resize((mark_bound,mark_bound), Image.Resampling.LANCZOS)
+marker_red = red.resize((mark_bound,mark_bound), Image.Resampling.LANCZOS)
+marker_yellow = yellow.resize((mark_bound,mark_bound), Image.Resampling.LANCZOS)
 
 # photoimage = ImageTk.PhotoImage(marker_img)
 # guidance = canvas.create_image(x_start,y_start,image=photoimage,anchor='center')
