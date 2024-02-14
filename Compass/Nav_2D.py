@@ -8,7 +8,6 @@ import adafruit_lsm303_accel
 import math
 import time
 import busio
-from gpiozero import LED
 from Mapbox_functions import find_bearing_angle, haversine_distance, get_route_coordinates
 import numpy as np
 import serial
@@ -44,6 +43,7 @@ i2c = busio.I2C(board.SCL, board.SDA)
 mag = adafruit_lis2mdl.LIS2MDL(i2c)
 accel = adafruit_lsm303_accel.LSM303_Accel(i2c)
 hardiron_cal = compass.calibrate(mag)
+#hardiron_cal = [[-83.39999999999999, 5.85], [-45.75, 24.15], [-11.549999999999999, 37.949999999999996]]
 #hardiron_cal = [[-70.5, 29.7], [-58.8, 24.15], [-16.2, 82.35]]
 #hardiron_cal = [[-80.1, 3.15], [19.65, 104.55], [19.05, 96.0]]  # At table in OEDK
 #hardiron_cal = [[-93.45, 31.65], [-55.05, 68.7], [-28.799999999999997, 93.0]]
@@ -52,18 +52,18 @@ hardiron_cal = compass.calibrate(mag)
 #print(f"Hardiron Cal = {hardiron_cal}")
 # Finish calibration
 #screen_vec = tk.Tk()
-led_right = LED(10)
-led_left = LED(9)
+
 distance = 112
-x_boundary = 1200 #1920 + 10  # +10 to eliminate any white areas on screen
-y_boundary = 600  #1080
+x_boundary = 1920  # +10 to eliminate any white areas on screen
+y_boundary = 1080
 x_start = x_boundary/2
 y_start = y_boundary/2
 marker_x = x_start
 marker_y = y_start
 right_toggle = 0
 overflow = 4 * x_boundary
-speed_var = 2.25
+speed_var = 3
+refresh_rate = 10
 #Values are received from angle given by magnetometer
 look_x = 400
 look_y = 540
@@ -291,17 +291,13 @@ def moveMark():
    if (marker_x <= marker_size and look_x <= marker_size) or (marker_x >= x_boundary - marker_size  and look_x >= x_boundary - marker_size):
       xspeed = 0
       if (marker_x <= marker_size and look_x <= marker_size):
-         led_left.on()
          canvas.moveto(guidance, -marker_size/2, marker_y - marker_size/2)
          canvas.moveto(obj_dist, 20, marker_y)
       else:
-         led_right.on()
          canvas.moveto(guidance, x_boundary-marker_size/2, marker_y - marker_size/2)
          canvas.moveto(obj_dist, x_boundary+20, marker_y)
    else:
       xspeed = speed_var*(look_x - marker_x) / 50
-      led_left.off()
-      led_right.off()
 
    if (marker_y <= marker_size and look_y <= marker_size) or (marker_y >= y_boundary-marker_size and look_y >= y_boundary-marker_size):
       yspeed = 0
@@ -337,12 +333,14 @@ def moveMark():
    elif marker_y < marker_size - edge_margin:
       marker_y = marker_size
     #  y_pos.configure(text = f'current x value: {marker_y}')
-   canvas.after(15, moveMark)
+   canvas.after(refresh_rate, moveMark)
 
+def move_app(event):
+    window.geometry(f'+{event.x_root}+{event.y_root}')
 
 window = tk.Tk()
 
-canvas = tk.Canvas(window,width=x_boundary,height=y_boundary)
+canvas = tk.Canvas(window,width=x_boundary,height=y_boundary, bd=0, highlightthickness=0)
 canvas.pack()
 canvas.configure(background='black')
 #Load an image in the script
@@ -354,40 +352,20 @@ dist_lab.pack()
 obj_dist = canvas.create_window(x_start+20, y_start, window=dist_lab, anchor='nw') 
 #Did NOT WORK
 # dist_lab.place(100,100,width=50)
-"""
-x_pos = tk.Label(window, fg='black')
-x_pos.configure(text = f'current x value: {marker_x}')
-x_pos.pack()
-canvas.create_window(0, 0, window=x_pos, anchor='nw')
-y_pos = tk.Label(window, fg='black')
-y_pos.configure(text = f'current y value: {marker_y}')
-y_pos.pack()
-canvas.create_window(0, 20, window=y_pos, anchor='nw')
 
-eye_x_pos = tk.Label(window, fg='black')
-eye_x_pos.configure(text = f'current look x value: {look_x}')
-eye_x_pos.pack()
-canvas.create_window(0, 40, window=eye_x_pos, anchor='nw')
-eye_y_pos = tk.Label(window, fg='black')
-eye_y_pos.configure(text = f'current look y value: {look_y}')
-eye_y_pos.pack()
-canvas.create_window(0, 60, window=eye_y_pos, anchor='nw')
-
-move_x = tk.Label(window, fg='black')
-move_x.configure(text = f'current x speed: {xspeed}')
-move_x.pack()
-canvas.create_window(0, 80, window=move_x, anchor='nw')
-move_y = tk.Label(window, fg='black')
-move_y.configure(text = f'current y speed: {yspeed}')
-move_y.pack()
-canvas.create_window(0, 100, window=move_y, anchor='nw')
-"""
 #Resize the Image using resize method
 resized_image= img.resize((marker_size,marker_size), Image.Resampling.LANCZOS)
 
 photoimage = ImageTk.PhotoImage(resized_image)
 # guidance = canvas.create_image(350,350,image=photoimage,anchor='nw')
 guidance = canvas.create_image(x_start,y_start,image=photoimage,anchor='center')
-
+window.overrideredirect(True)
+title_bar = tk.Frame(window, bg='black', bd=1)
+title_bar.pack(expand=1, fill=tk.X)
+title_bar.bind("<B1-Motion>", move_app)
+title_label = tk.Label(title_bar, text="fuck you", bg='black')
+title_label.pack(side=tk.LEFT)
+close_button = tk.Button(window, text="x", font="Helvetica, 8", command=window.quit)
+close_button.pack(pady=10)
 canvas.after(10, moveMark)
 window.mainloop()
