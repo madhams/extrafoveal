@@ -5,14 +5,14 @@ from tkinter import ttk
 from PIL import Image, ImageTk
 
 distance = 112
-x_boundary = 1000
-y_boundary = 600
+x_boundary = 1500
+y_boundary = 850
 x_start = x_boundary/2
 y_start = y_boundary/2
 # marker_x = x_start
 # marker_y = y_start
 right_toggle = 0
-overflow = 100
+overflow = 150
 edge_margin = 20
 x_values = []
 y_values = []
@@ -29,12 +29,14 @@ num = 0
 guidance = []
 dist = []
 
+
+
 def click(event):
     global canvas, num, guidance, dist
     x,y = (event.x), (event.y)
-    canvas.tab[num]['image'] = ImageTk.PhotoImage(marker_img)
+    canvas.tab[num]['image'] = ImageTk.PhotoImage(icons[icon_values[icon_value]])
     guidance.append(canvas.create_image(x,y, image=canvas.tab[num]['image'], anchor='center'))
-    dist.append(canvas.create_text(x+20, y+5, text=f'{distance} m', font='SegoeUI 13',fill='black', anchor='nw'))
+    dist.append(canvas.create_text(x+20, y+5, text=f'{distance} m', font='SegoeUI 13',fill='white', anchor='nw'))
     x_values.append(x)
     y_values.append(y)
     look_x.append(x)
@@ -46,7 +48,7 @@ def click(event):
 def blue(event):
     global canvas, num, guidance, dist
     x,y = (event.x), (event.y)
-    canvas.tab[num]['image'] = ImageTk.PhotoImage(marker_blue)
+    canvas.tab[num]['image'] = blue
     guidance.append(canvas.create_image(x,y, image=canvas.tab[num]['image'], anchor='center'))
     dist.append(canvas.create_text(x+20, y+5, text=f'{distance} m', font='SegoeUI 13',fill='black', anchor='nw'))
     x_values.append(x)
@@ -114,20 +116,26 @@ def deleteImage(event):
     num -= 1
 
 def count_up(event):
-   global distance
-   distance = distance + 1
+   global icon_value
+   if icon_value < 4:
+      icon_value += 1
+   x_pos.configure(text = f'current icon value: {icon_value}')
+   # distance = distance + 1
    # dist_lab.configure(text = f'{distance} skelingtons')
-   canvas.itemconfigure(dist, text = f'{distance} m')
+   # canvas.itemconfigure(dist, text = f'{distance} m')
    # if distance == 1:
    #       canvas.itemconfigure(dist, text = f'{distance} meter')
 
 
 def count_down(event):
-   global distance
-   if distance > 0:
-      distance = distance - 1
-      # dist_lab.configure(text = f'{distance} skelingtons')
-      canvas.itemconfigure(dist, text = f'{distance} m')
+   global icon_value
+   if icon_value > 0:
+      icon_value -= 1
+   x_pos.configure(text = f'current icon value: {icon_value}')
+   # if distance > 0:
+   #    distance = distance - 1
+   #    # dist_lab.configure(text = f'{distance} skelingtons')
+   #    canvas.itemconfigure(dist, text = f'{distance} m')
       # if distance == 1:
       #    canvas.itemconfigure(dist, text = f'{distance} meter')
 
@@ -209,7 +217,7 @@ def move_right(event):
 def look_up(event):
    global look_y, num, x_values, y_values, look_x
    for i in range(num):
-      look_y[i] = look_y[i] - 20
+      look_y[i] = look_y[i] - (20 + 15*i)
    print("x_values:" + str(x_values))
    print("y_values:" + str(y_values))
    print("look_x:" + str(look_x))
@@ -219,7 +227,7 @@ def look_up(event):
 def look_down(event):
    global look_y, num, x_values, y_values, look_x
    for i in range(num):
-      look_y[i] = look_y[i] + 20
+      look_y[i] = look_y[i] + (20 + 15*i)
    print("x_values:" + str(x_values))
    print("y_values:" + str(y_values))
    print("look_x:" + str(look_x))
@@ -230,7 +238,7 @@ def look_down(event):
 def look_left(event):
    global look_x, num, x_values, y_values, look_y
    for i in range(num):
-      look_x[i] = look_x[i] - 20
+      look_x[i] = look_x[i] - (20 + 15*i)
    print("x_values:" + str(x_values))
    print("y_values:" + str(y_values))
    print("look_x:" + str(look_x))
@@ -241,7 +249,7 @@ def look_left(event):
 def look_right(event):
    global look_x, num, x_values, y_values, look_y
    for i in range(num):
-      look_x[i] = look_x[i] + 20
+      look_x[i] = look_x[i] + (20 + 15*i)
    print("x_values:" + str(x_values))
    print("y_values:" + str(y_values))
    print("look_x:" + str(look_x))
@@ -409,7 +417,7 @@ window.bind("<Down>",count_down)
 
 
 
-canvas = tk.Canvas(window,width=x_boundary,height=y_boundary)
+canvas = tk.Canvas(window,width=x_boundary,height=y_boundary, bg='black')
 canvas.pack()
 canvas.tab = [{} for q in range(50)]
 canvas.focus_set()
@@ -425,11 +433,12 @@ canvas.focus_set()
 
 #dist = canvas.create_text(x_start+20, y_start+5, text=f'{distance} m', font='SegoeUI 13',fill='black', anchor='nw')
 
+
+# x_pos = tk.Label(window, fg='black')
+# x_pos.configure(text = f'current icon value: {icon_value}')
+# x_pos.pack()
+# canvas.create_window(0, 0, window=x_pos, anchor='nw')
 """
-x_pos = tk.Label(window, fg='black')
-x_pos.configure(text = f'current x value: {x_value}')
-x_pos.pack()
-canvas.create_window(0, 0, window=x_pos, anchor='nw')
 y_pos = tk.Label(window, fg='black')
 y_pos.configure(text = f'current y value: {marker_y}')
 y_pos.pack()
@@ -466,6 +475,24 @@ marker_blue = blue.resize((mark_bound,mark_bound), Image.Resampling.LANCZOS)
 marker_green = green.resize((mark_bound,mark_bound), Image.Resampling.LANCZOS)
 marker_red = red.resize((mark_bound,mark_bound), Image.Resampling.LANCZOS)
 marker_yellow = yellow.resize((mark_bound,mark_bound), Image.Resampling.LANCZOS)
+
+
+icons = {'path' : marker_img, 'good' : marker_blue, 'danger' : marker_red, 'investigate': marker_yellow, 'path_end' : marker_green}
+icon_value = 0
+icon_values = ['path', 'good', 'danger', 'investigate', 'path_end']
+xy_tests = [(100,425), (900,425), (300,425), (400,425), (1200,425)]
+
+for i in range(len(icon_values)):
+   canvas.tab[num]['image'] = ImageTk.PhotoImage(icons[icon_values[i]])
+   guidance.append(canvas.create_image(xy_tests[i][0],xy_tests[i][1], image=canvas.tab[num]['image'], anchor='center'))
+   dist.append(canvas.create_text(xy_tests[i][0]+20, xy_tests[i][1]+5, text=f'{distance} m', font='SegoeUI 13',fill='white', anchor='nw'))
+   x_values.append(xy_tests[i][0])
+   y_values.append(xy_tests[i][1])
+   look_x.append(xy_tests[i][0])
+   look_y.append(xy_tests[i][1])
+   xspeeds.append(0)
+   yspeeds.append(0)
+   num += 1
 
 # photoimage = ImageTk.PhotoImage(marker_img)
 # guidance = canvas.create_image(x_start,y_start,image=photoimage,anchor='center')
